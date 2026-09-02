@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>謎のボタン</title>
+<style>
+:root{--main:#ff3030;--bg:#060606;--text:#f5f5f5;--sub:#888}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(circle at center,#171717 0%,var(--bg) 55%);color:var(--text);font-family:"Yu Gothic","Meiryo",Arial,sans-serif;display:flex;justify-content:center;align-items:center;overflow-x:hidden;transition:background .6s,color .3s}
+body.flash{animation:flash .18s}@keyframes flash{0%{filter:brightness(1)}50%{filter:brightness(3)}100%{filter:brightness(1)}}
+.app{width:min(760px,94%);padding:28px 18px 40px;text-align:center}.topline{font:11px Consolas,monospace;letter-spacing:4px;color:#555;margin-bottom:18px}
+h1{margin:0;font-size:clamp(42px,10vw,82px);letter-spacing:.18em;text-shadow:0 0 22px var(--main)}
+.subtitle{min-height:28px;margin:12px 0 25px;color:var(--sub);line-height:1.7}
+.button-wrap{position:relative;width:min(280px,65vw);height:min(280px,65vw);margin:0 auto}
+#mainButton{width:100%;height:100%;border-radius:50%;border:10px solid rgba(255,255,255,.12);background:radial-gradient(circle at 33% 28%,#fff 0 3%,#ffbbbb 4% 7%,var(--main) 18%,#480000 80%);color:#fff;font-size:34px;font-weight:900;cursor:pointer;box-shadow:0 0 24px var(--main),0 0 75px rgba(255,0,0,.16),inset 0 -22px 30px rgba(0,0,0,.55);transition:transform .08s,filter .2s,box-shadow .4s}
+#mainButton:hover{transform:scale(1.04);filter:brightness(1.1)}#mainButton:active{transform:scale(.91)}
+.counter-label{margin-top:28px;font-size:11px;letter-spacing:4px;color:#666}#counter{font:800 clamp(42px,10vw,70px) Consolas,monospace;margin:4px 0;text-shadow:0 0 18px var(--main)}
+#message{min-height:32px;color:#aaa;margin-top:12px}.level{width:min(520px,100%);margin:24px auto 0}#levelName{font:12px Consolas,monospace;letter-spacing:2px;color:#777;margin-bottom:8px}
+.bar{height:10px;background:#1d1d1d;border-radius:999px;overflow:hidden;border:1px solid #282828}#barFill{width:0%;height:100%;background:var(--main);box-shadow:0 0 14px var(--main);transition:width .3s,background .5s}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}.card{background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:14px}.card-title{font-size:10px;letter-spacing:3px;color:#555}.card-value{margin-top:7px;font:18px Consolas,monospace}
+.log{margin-top:16px;text-align:left;background:rgba(0,0,0,.28);border:1px solid rgba(255,255,255,.07);border-radius:14px;padding:14px;max-height:155px;overflow:auto;font:12px/1.7 Consolas,monospace;color:#666}.log div{border-bottom:1px solid rgba(255,255,255,.04);padding:3px 0}
+.small{margin-top:16px;font-size:11px;color:#444}
+#event{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.82);z-index:20;padding:20px}.event-box{width:min(520px,95%);background:#111;border:1px solid var(--main);box-shadow:0 0 35px rgba(255,0,0,.22);border-radius:18px;padding:26px;text-align:center}.event-title{font-size:12px;letter-spacing:4px;color:var(--main)}.event-text{font-size:24px;font-weight:800;margin:18px 0 20px;line-height:1.5}.event-btn{border:0;border-radius:10px;background:var(--main);color:#fff;font-weight:800;padding:12px 22px;cursor:pointer}
+#miniGame{display:none}.target-area{position:relative;height:220px;margin-top:16px;border:1px solid #292929;border-radius:14px;background:#080808;overflow:hidden}#target{position:absolute;width:62px;height:62px;border:0;border-radius:50%;background:#fff;cursor:pointer;box-shadow:0 0 25px #fff}.timer{font:18px Consolas,monospace;color:#aaa}
+.shake{animation:shake .22s}@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;background:repeating-linear-gradient(0deg,transparent 0,transparent 2px,#fff 3px)}
+@media(max-width:600px){.info{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="topline">UNKNOWN SYSTEM // ONLINE</div>
+  <h1 id="title">謎のボタン</h1>
+  <div class="subtitle" id="subtitle">なぜここにあるのか、誰も知りません。</div>
+  <div class="button-wrap"><button id="mainButton">押す</button></div>
+  <div class="counter-label">TOTAL PRESSES</div>
+  <div id="counter">0</div>
+  <div id="message">まだ何も起きていません。</div>
+  <div class="level"><div id="levelName">LEVEL 1 — NORMAL</div><div class="bar"><div id="barFill"></div></div></div>
+  <div class="info">
+    <div class="card"><div class="card-title">CURRENT STATUS</div><div class="card-value" id="status">OBSERVING</div></div>
+    <div class="card"><div class="card-title">SESSION PRESSES</div><div class="card-value" id="session">0</div></div>
+  </div>
+  <div class="log" id="log"><div>SYSTEM: 起動しました。</div></div>
+  <div class="small">※ 回数はこのブラウザに保存されます。</div>
+</div>
+<div id="event">
+  <div class="event-box">
+    <div class="event-title">UNKNOWN EVENT</div>
+    <div class="event-text" id="eventText">何かが起きました。</div>
+    <button class="event-btn" id="eventClose">続ける</button>
+    <div id="miniGame">
+      <div class="timer">制限時間：<span id="time">5.0</span>秒</div>
+      <div class="target-area" id="targetArea"><button id="target"></button></div>
+    </div>
+  </div>
+</div>
+<script>
+let count=Number(localStorage.getItem("mystery_count"))||0;
+let sessionCount=0, eventOpen=false, miniGameRunning=false, gameTimer=null;
+const mainButton=document.getElementById("mainButton"),counter=document.getElementById("counter"),message=document.getElementById("message"),title=document.getElementById("title"),subtitle=document.getElementById("subtitle"),status=document.getElementById("status"),session=document.getElementById("session"),levelName=document.getElementById("levelName"),barFill=document.getElementById("barFill"),log=document.getElementById("log"),event=document.getElementById("event"),eventText=document.getElementById("eventText"),eventClose=document.getElementById("eventClose"),miniGame=document.getElementById("miniGame"),target=document.getElementById("target"),targetArea=document.getElementById("targetArea"),timeDisplay=document.getElementById("time");
+const messages=["記録されました。","……。","何も起きません。","本当に何も起きていません。","なぜ押した？","まだ足りません。","誰かも押しています。","見られています。","もう一度。","気のせいです。"];
+const levels=[{min:0,max:9,name:"LEVEL 1 — NORMAL",color:"#ff3030",bg:"#060606"},{min:10,max:49,name:"LEVEL 2 — BLUE",color:"#238cff",bg:"#050b18"},{min:50,max:99,name:"LEVEL 3 — PURPLE",color:"#a855f7",bg:"#10051a"},{min:100,max:499,name:"LEVEL 4 — GREEN",color:"#20d878",bg:"#03140b"},{min:500,max:999,name:"LEVEL 5 — ORANGE",color:"#ff8a00",bg:"#170c00"},{min:1000,max:4999,name:"LEVEL 6 — PINK",color:"#ff28b8",bg:"#170010"},{min:5000,max:9999,name:"LEVEL 7 — VOID",color:"#7c4dff",bg:"#090510"},{min:10000,max:Infinity,name:"LEVEL ∞ — UNKNOWN",color:"#ffffff",bg:"#000000"}];
+function addLog(text){const now=new Date(),time=String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0")+":"+String(now.getSeconds()).padStart(2,"0"),div=document.createElement("div");div.textContent="["+time+"] "+text;log.appendChild(div);while(log.children.length>8)log.removeChild(log.firstChild);log.scrollTop=log.scrollHeight}
+function getLevel(){for(const level of levels)if(count>=level.min&&count<=level.max)return level;return levels[0]}
+function updateWorld(){counter.textContent=count.toLocaleString();session.textContent=sessionCount.toLocaleString();const level=getLevel();document.documentElement.style.setProperty("--main",level.color);document.documentElement.style.setProperty("--bg",level.bg);levelName.textContent=level.name;const progress=level.max===Infinity?(count%1000)/10:((count-level.min)/(level.max-level.min+1))*100;barFill.style.width=Math.min(progress,100)+"%"}
+function save(){localStorage.setItem("mystery_count",String(count))}
+function specialEvent(){if(count===10){title.textContent="変化しました。";subtitle.textContent="気のせいではありません。";addLog("WORLD SHIFT")}if(count===25){title.textContent="誰かいる。";status.textContent="UNKNOWN";addLog("UNKNOWN SIGNAL")}if(count===50){title.textContent="まだ続けるの？";mainButton.textContent="続ける";addLog("BEHAVIOR: ABNORMAL")}if(count===100){title.textContent="観測対象";subtitle.textContent="あなたは100回押しました。";addLog("SUBJECT IDENTIFIED")}if(count===500){title.textContent="500";subtitle.textContent="普通なら、もう飽きています。";addLog("PERSISTENCE WARNING")}if(count===1000){title.textContent="∞";subtitle.textContent="ここから先は未知の領域です。";status.textContent="UNSTABLE";addLog("SYSTEM LIMIT: UNKNOWN")}if(count===5000){title.textContent="VOID";subtitle.textContent="数字に意味があるとは限りません。";addLog("VOID ACCESS")}if(count===10000){title.textContent="？？？";subtitle.textContent="あなたは何をしている？";status.textContent="YOU ARE STILL HERE";addLog("CRITICAL PERSISTENCE")}}
+function randomEvent(){const r=Math.random();if(r<.035){document.body.classList.add("flash");setTimeout(()=>document.body.classList.remove("flash"),180);message.textContent="ERROR: 世界の整合性を確認できません。";addLog("ERROR EVENT");return}if(r<.07){message.textContent="誰かが、あなたと同時に押しました。";addLog("UNKNOWN USER ACTIVITY");return}if(r<.10){showEvent("ボタンがあなたを見ています。",false);return}if(r<.125&&count>=20){startMiniGame();return}if(r<.145){mainButton.textContent="？";message.textContent="ボタンの状態が変化しました。";setTimeout(()=>mainButton.textContent=count>=50?"続ける":"押す",700);addLog("BUTTON STATE CHANGED")}}
+function showEvent(text,startGame){event.style.display="flex";eventOpen=true;eventText.textContent=text;miniGame.style.display=startGame?"block":"none";eventClose.style.display=startGame?"none":"inline-block"}
+eventClose.addEventListener("click",()=>{event.style.display="none";eventOpen=false});
+function moveTarget(){const maxX=targetArea.clientWidth-target.offsetWidth,maxY=targetArea.clientHeight-target.offsetHeight;target.style.left=Math.floor(Math.random()*Math.max(maxX,1))+"px";target.style.top=Math.floor(Math.random()*Math.max(maxY,1))+"px"}
+function startMiniGame(){event.style.display="flex";eventOpen=true;miniGame.style.display="block";eventClose.style.display="none";eventText.textContent="5秒以内に白い円をクリックしろ。";miniGameRunning=true;let remaining=5;timeDisplay.textContent=remaining.toFixed(1);moveTarget();clearInterval(gameTimer);gameTimer=setInterval(()=>{remaining-=.1;timeDisplay.textContent=Math.max(remaining,0).toFixed(1);if(remaining<=0){clearInterval(gameTimer);miniGameRunning=false;eventText.textContent="失敗。……でも、何も起きない。";miniGame.style.display="none";eventClose.style.display="inline-block";addLog("MINIGAME FAILED")}},100)}
+target.addEventListener("click",()=>{if(!miniGameRunning)return;clearInterval(gameTimer);miniGameRunning=false;count+=25;save();updateWorld();eventText.textContent="成功。ボーナス +25";miniGame.style.display="none";eventClose.style.display="inline-block";addLog("MINIGAME SUCCESS +25")});
+mainButton.addEventListener("click",()=>{if(eventOpen)return;count++;sessionCount++;save();message.textContent=messages[Math.floor(Math.random()*messages.length)];document.body.classList.remove("shake");void document.body.offsetWidth;document.body.classList.add("shake");updateWorld();specialEvent();randomEvent()});
+updateWorld();addLog("WORLD READY");
+</script>
+</body>
+</html>
