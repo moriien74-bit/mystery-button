@@ -180,4 +180,45 @@ function splitEvent(){
 
       btn.addEventListener("click",()=>{
         if(i === realIndex){
-          alert
+          alert("本物のボタンだった！");
+        }else{
+          alert("ボタンが笑っています。");
+        }
+        splitArea.innerHTML = "";
+      });
+
+      splitArea.appendChild(btn);
+    }
+  }
+}
+
+// 逃げるイベント（1/150）
+function escapeEvent(){
+  if(Math.random() < 1/150){
+    const x = Math.random()*200 - 100;
+    const y = Math.random()*200 - 100;
+    button.style.transform = `translate(${x}px,${y}px)`;
+    setTimeout(()=>button.style.transform="",800);
+  }
+}
+
+button.addEventListener("click",function(){
+
+  count++;
+  localStorage.setItem("mystery_count",count);
+  countText.textContent = count;
+
+  updateBackground();
+
+  // イベント発動
+  rareEvent();
+  evolveEvent();
+  treasureEvent();
+  splitEvent();
+  escapeEvent();
+
+});
+</script>
+
+</body>
+</html>
